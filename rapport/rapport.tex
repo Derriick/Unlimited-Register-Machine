@@ -1,0 +1,87 @@
+\documentclass[11pt, a4paper, twoside, titlepage]{article}
+\usepackage[a4paper]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{listings}
+\usepackage{color}
+
+\geometry{hscale=0.75, vscale=0.85, centering}
+\font\titlefont=cmr12 at 24pt
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+\definecolor{mycontrol}{rgb}{0.98,0.98,0.98}
+
+\lstset{
+	backgroundcolor=\color{mycontrol}, % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+	basicstyle=\footnotesize,          % the size of the fonts that are used for the code
+	breakatwhitespace=false,           % sets if automatic breaks should only happen at whitespace
+	breaklines=true,                   % sets automatic line breaking
+	captionpos=b,                      % sets the caption-position to bottom
+	commentstyle=\color{mygreen},      % comment style
+	deletekeywords={...},              % if you want to delete keywords from the given language
+	escapeinside={\%*}{*)},            % if you want to add LaTeX within your code
+	extendedchars=true,                % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+	frame=single,	                     % adds a frame around the code
+	keepspaces=true,                   % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+	keywordstyle=\color{blue},         % keyword style
+	language=caml,                     % the language of the code
+	morekeywords={*,...},              % if you want to add more keywords to the set
+	numbers=none,                      % where to put the line-numbers; possible values are (none, left, right)
+	numbersep=5pt,                     % how far the line-numbers are from the code
+	numberstyle=\tiny\color{mygray},   % the style that is used for the line-numbers
+	rulecolor=\color{black},           % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+	showspaces=false,                  % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+	showstringspaces=false,            % underline spaces within strings only
+	showtabs=false,                    % show tabs within strings adding particular underscores
+	stepnumber=2,                      % the step between two line-numbers. If it's 1, each line will be numbered
+	stringstyle=\color{mymauve},       % string literal style
+	tabsize=4,                         % sets default tabsize to 2 spaces
+	title=\lstname                     % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\begin{document}
+
+\title{{\titlefont Travaux Pratiques URM}}
+\author{Pierre KOEBELIN}
+\date{\today}
+\maketitle
+
+\begin{abstract}
+	L'objectif de ce projet est l'implémentation d'un simulateur pour les URMs. Une machine à registres exécute des instructions, assigne des registres et lit un programme. Les instructions sont représentées par le type:
+\begin{lstlisting}
+	type instruction =
+	| Reset of int
+	| Incr of int
+	| Set of int*int
+	| Jump of int*int*int
+\end{lstlisting}
+	Les registres sont stockés dans des tableaux que nous initialisons à une taille fixe \texttt{max\_registers}. Pour chaque programme, le résultat après son exécution est stocké dans le registre 0. Il reste cependant possible de récupérer des résultats dans d'autres registres. Un programme est alors un tableau d’instructions.\\
+	Quelques outils ont également été implémentés pour manipuler des URM.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+\section{Exercices}
+
+\subsection{Exercice 1}
+
+\subsection{Exercice 2}
+
+\subsection{Exercice 3}
+
+\subsection{Exercice 4}
+
+\subsection{Exercice 5}
+
+\subsection{Exercice 6}
+
+\subsection{Exercice 7}
+
+\section{Tests}
+
+
+\end{document}

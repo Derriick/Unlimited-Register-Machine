@@ -4,11 +4,11 @@ type instruction =
 	| Set of int * int
 	| Jump of int * int * int
 
-type prog = instruction array
+type program = instruction array
 type reg_array = int array
 
-let max_reg = 8
-let max_steps = 100
+let max_reg = 128
+let max_step = 10000
 
 exception Memory_exhausted
 exception Segmentation_fault
@@ -17,13 +17,13 @@ exception Resources_exhausted
 let empty = Array.make 0 (Set(0,0))
 
 let is_memory_exhausted n =
-	if compare n max_reg >= 0 then
+	if n >= max_reg then
 	raise Memory_exhausted
 	else
 	()
 
 let is_segmentation_fault n =
-	if compare n max_reg >= 0 then
+	if n >= max_reg then
 	raise Segmentation_fault
 	else
 	()
@@ -81,10 +81,10 @@ let rho prog =
 	Array.fold_left (
 		fun reg_max inst ->
 			match inst with
-			| Reset(n1) -> max reg_max n1
-			| Incr(n1) -> max reg_max n1
-			| Set(n1, _) -> max reg_max n1
-			| _ -> reg_max
+			| Reset(r) -> max reg_max r
+			| Incr(r) -> max reg_max r
+			| Set(r1, r2) -> max reg_max (max r1 r2)
+			| Jump(r1, r2, _) -> max reg_max (max r1 r2)
 		) 0 prog
 
 let normalize prog =
@@ -104,7 +104,7 @@ let clean_program prog =
 	in
 	Array.append prog reset_prog
 
-let step_program reg_array prog max_steps =
+let step_program reg_array prog max_step =
 	let rec aux i steps =
 		let _ = is_resources_exhausted steps in
 		let next_i = run_instruction reg_array (prog.(i)) i in
@@ -113,10 +113,10 @@ let step_program reg_array prog max_steps =
 		else
 			aux next_i (steps - 1)
 	in
-	aux 0 max_steps
+	aux 0 max_step
 
 let run_program reg_array prog =
-	let _ = step_program reg_array prog max_steps in
+	let _ = step_program reg_array prog max_step in
 	reg_array.(0)
 
 let run_function prog n =

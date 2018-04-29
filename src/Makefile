@@ -1,4 +1,4 @@
-APP = app
+APP = test
 
 CAMLC = ocamlc
 .PRECIOUS: %.cmi %.cmo

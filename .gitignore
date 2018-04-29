@@ -18,3 +18,12 @@ _build/
 # oasis generated files
 setup.data
 setup.log
+
+# latex
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.pdf
+*.synctex.gz
+*.toc

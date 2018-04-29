@@ -4,7 +4,7 @@ type instruction =
 	| Set of int * int
 	| Jump of int * int * int
 
-type prog = instruction array
+type program = instruction array
 type reg_array = int array
 
 exception Memory_exhausted
@@ -12,11 +12,11 @@ exception Segmentation_fault
 exception Resources_exhausted
 
 val max_reg : int
-val max_steps : int
-val empty : prog
+val max_step : int
+val empty : program
 
 val print_reg_array : reg_array -> int -> unit
-val print_prog : prog -> unit
-val rho : prog -> int
-val normalize : prog -> prog
-val run_program : reg_array -> prog -> int
+val print_prog : program -> unit
+val rho : program -> int
+val normalize : program -> program
+val run_program : reg_array -> program -> int
