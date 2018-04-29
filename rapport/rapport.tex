@@ -5,6 +5,7 @@
 \usepackage[french]{babel}
 \usepackage{listings}
 \usepackage{color}
+\usepackage{hyperref}
 
 \geometry{hscale=0.75, vscale=0.85, centering}
 \font\titlefont=cmr12 at 24pt
@@ -50,7 +51,8 @@
 \maketitle
 
 \begin{abstract}
-	L'objectif de ce projet est l'implémentation d'un simulateur pour les URMs. Une machine à registres exécute des instructions, assigne des registres et lit un programme. Les instructions sont représentées par le type:
+L'ensemble du code du projet est disponible sur GitHub à l'adresse \url{https://github.com/Derriick/Unlimited-Register-Machine}.\\
+L'objectif de ce projet est l'implémentation d'un simulateur pour les URMs. Une machine à registres exécute des instructions, assigne des registres et lit un programme. Les instructions sont représentées par le type:
 \begin{lstlisting}
 	type instruction =
 	| Reset of int
@@ -58,30 +60,109 @@
 	| Set of int*int
 	| Jump of int*int*int
 \end{lstlisting}
-	Les registres sont stockés dans des tableaux que nous initialisons à une taille fixe \texttt{max\_registers}. Comme dans le cours, nous utilisons le registre 0 pour désigner l’instruction en cours. Pour chaque programme, le résultat après son exécution est stocké dans le registre 1 par défaut. Il reste cependant possible de récupérer des résultats dans d'autres registres. Un programme est alors un tableau d’instructions.\\
-	Quelques outils ont également été implémentés pour manipuler des URM.
+Les registres sont stockés dans des tableaux que nous initialisons à une taille fixe \texttt{max\_registers}. Comme dans le cours, nous utilisons le registre 0 pour désigner l’instruction en cours. Pour chaque programme, le résultat après son exécution est stocké dans le registre 1 par défaut. Il reste cependant possible de récupérer des résultats dans d'autres registres. Un programme est alors un tableau d’instructions.\\
+Quelques outils ont également été implémentés pour manipuler des URM.
 \end{abstract}
 
 \tableofcontents
 
 \newpage
 \section{Exercices}
+\paragraph{Code}
+L'ensemble de l'implémentation concernant les exercices du TP noté est disponible dans le fichier \texttt{src/mgr.ml}. Il se sert du code réalisé lors du $1^{er}$ TP, situé dans le fichier \texttt{src/urm.ml}; il constitue la base d'une \textit{Unlimited Register Machine}.
 
 \subsection{Exercice 1}
+Chaque programme est représenté sous la forme d'un tableau d'instructions. Il en est de même pour l'ensemble des exercices. Ces programmes serviront ensuite à réaliser l'ensemble des tests.
+
+\subsubsection{\texttt{succ}}
+Le but de ce programme d'incrémenter la valeur se trouvant dans le $1^{er}$ registre. Pour cela, j'utilise simplement l'instruction \texttt{Incr(1)}.
+\begin{lstlisting}
+	 0 Incr(1)
+\end{lstlisting}
+
+\subsubsection{\texttt{sum}}
+Le but de ce programme de calculer la somme des valeurs contenues dans les $1^{er}$ et $2^{eme}$ registres. Pour cela, j'utilise la suite d'instructions suivante:
+\begin{lstlisting}
+	 0 Reset(3)
+	 1 Jump(2,3,5)
+	 2 Incr(1)
+	 3 Incr(3)
+	 4 Jump(0,0,1)
+\end{lstlisting}
+
+\subsubsection{\texttt{constant}}
+Ce programme ne doit rien faire par définition. Cependant, l'implémentation de l'URM m'empêche d'utiliser un programme vide. Je copie dont le contenu du $1^{er}$ registre dans lui-même avec l'instruction \texttt{Set(1, 1)}.
+\begin{lstlisting}
+ 	 0 Set(1,1)
+\end{lstlisting}
+
+\subsubsection{\texttt{bigger}}
+L'objectif de ce programme est de renvoyer \texttt{1} si la valeur contenue dans le $1^{er}$ registre est strictement supérieure à celle du $2^{nd}$, et \texttt{0} sinon. J'utilise donc la suite d'instructions suivantes:
+\begin{lstlisting}
+	 0 Set(1,3)
+	 1 Set(2,4)
+	 2 Jump(1,4,10)
+	 3 Jump(2,3,7)
+	 4 Incr(1)
+	 5 Incr(2)
+	 6 Jump(0,0,2)
+	 7 Reset(1)
+	 8 Incr(1)
+	 9 Jump(0,0,11)
+	10 Reset(1)
+\end{lstlisting}
 
 \subsection{Exercice 2}
+Les fonctions \texttt{string\_of\_prog} et \texttt{debut\_program} sont utilisées lors des tests afin d'avoir un rapide aperçu du programme exécuté, ainsi que des registres utilisés avant et après l'exécution.
 
-\subsection{Exercice 3}
+\subsubsection{\texttt{string\_of\_prog}}
+Cette fonction prend en entrée un programme dont elle affiche tout simplement le code. Pour cela, on parcours l'ensemble du programme, en écrivant chaque instruction précédée de son index.
 
-\subsection{Exercice 4}
+\subsubsection{\texttt{debut\_program}}
+Celle-ci quant à elle affiche les valeurs dans les registres, exécute le programme passé en paramètre, puis réaffiche leur contenu. Pour ce faire, elle prend en entrée un tableau de registres, un programme et renvoie la valeur contenue dans le $1^{er}$ registre après l'exécution.
 
-\subsection{Exercice 5}
+\subsection{Exercice 3: \texttt{compose1}}
+La fonction \texttt{compose1} prend en entrée 2 programmes et renvoie un seul étant la concaténation des 2. Cependant, les instructions \texttt{Jump} du $2^{nd}$ programme sont modifiées afin de pointer vers la bonne instruction. J'utilise donc la fonction \texttt{Array.map} pour parcourir l'ensemble du programme, et modifier chaque instruction \texttt{Jump} en ajoutant à son index la longueur du $1{er}$ programme.
 
-\subsection{Exercice 6}
+\subsection{Exercice 4: \texttt{translate}}
+Cette fonction permet de transformer un programme utilisant normalement avec des registres entre \texttt{1} et \texttt{n} pour qu'il puisse prendre en paramètre registres de \texttt{$a_1$} à \texttt{$a_n$}, puis de stocker le résultat dans un registre \texttt{k}. Cela permet de ne pas modifier les registres de \texttt{$a_1$} à \texttt{$a_n$}, pour qu'ils puissent être réutilisés par d'autre programmes. Elle renvoie ainsi un programme réalisant l'ensemble de ces actions.
 
-\subsection{Exercice 7}
+\subsection{Exercice 5: \texttt{compose2}}
+Cette fonction permet d'exécuter chaque programme \texttt{$G_i$} d'un vecteur \texttt{G} devant chaque utiliser les mêmes valeurs dans les registres, puis un programme \texttt{F} utilisant le résultat de chaque \texttt{$G_i$}. Pour ce faire, j'utilise la fonction \texttt{translate} qui me permet d'exécuter chaque programme de \texttt{G} avec à chaque fois les mêmes valeurs en entrée et de stocker les résultats à un endroit du banc de registres ne rentrant pas en conflit lors de l'exécution, ensuite lu par le programme \texttt{F}.
+
+\subsection{Exercice 6: \texttt{expr\_to\_prog}}
+Une expression est du type:
+\begin{lstlisting}
+	type expression =
+		| S of expression * expression
+		| I of int
+\end{lstlisting}
+À partir des programmes \texttt{sum} et \texttt{constant}, la fonction \texttt{expr\_to\_prog} produit un programme correspondant à l'expression en paramètre. J'utilise la fonction \texttt{translate} afin de réaliser l'ensemble des opérations de l'expression pour ne pas modifier le contenu des registre en entrée et placer le résultat de chaque \texttt{sum} ou \texttt{constant} au bon endroit pour passer à la suite.
+
+\subsection{Exercice 7: \texttt{if\_then\_else}}
+En fonction du résultat d'un programme \texttt{progC} (\texttt{C} pour condition), on veut exécuter le code de \texttt{progT} (\texttt{T} pour \texttt{true}) ou \texttt{progF} (\texttt{F} pour \texttt{false}).
+On utilise alors la fonction \texttt{if\_then\_else} dans laquelle j'exécute \texttt{progC}. Si le résultat est nul, j'exécute \texttt{progF}, et \texttt{progT} dans le cas contraire. Pour créer un tel programme, cette fonction prend en paramètres les 3 programmes, et en fait une composition en ajouter des instructions \texttt{Jump} entre chacun pour exécuter le code qui nous intéresse. J'attribue la valeur \texttt{0} grâce à l'instruction \texttt{Reset} pour faire la comparaison. J'emploie également la fonction \texttt{translate} pour que chaque programme est accès aux valeurs dont il a besoin.
 
 \section{Tests}
+L'ensemble des codes de test sont disponibles dans le fichier \texttt{src/app.ml} du projet. Il utilise les fonctions de \texttt{src/exec.ml} afin d'exécuter les programmes et afficher leur résultat.
+
+\subsection{Exercice 1}
+On exécute tout simplement les programmes \texttt{succ}, \texttt{sum}, \texttt{constant} et \texttt{bigger}.
+
+\subsection{Exercice 2}
+On exécute des programmes composés des 4 fonctions de l'exercice 1. On vérifie par exemple la transitivité de la fonction \texttt{compose1} ($3^{eme}$ et $4^{eme}$ tests), ainsi que la combinaison renvoie le bon résultat.
+
+\subsection{Exercice 3}
+Les fonctions \texttt{string\_of\_prog} et \texttt{debug\_program} sont utilisées pour chaque test des autres exercices.
+
+\subsection{Exercices 4 et 5}
+On vérifie la fonction \texttt{compose2} à partir des programmes de l'exercice 1, ainsi qu'avec des compositions de ceux-ci, obtenus à l'aide ce \texttt{compose1}.
+
+\subsection{Exercice 6}
+On crée quelques expressions dont vérifie ensuite le résultat après être passées par la fonction \texttt{expr\_to\_prog}. On change également l'ordre des registres dans l'expression afin de s'assurer que cela n'influence pas le résultat final.
+
+\subsection{Exercice 7}
+On teste quelques cas en sachant à l'avance quel programme entre \texttt{progT} et \texttt{progF} doit être exécuté, ainsi que son résultat. On utilise ensuite le programme \texttt{bigger} en tant que \texttt{progC}.
 
 
 \end{document}

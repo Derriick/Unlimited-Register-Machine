@@ -8,7 +8,7 @@ type expression =
 (*          EXERCICE 1         *)
 (*******************************)
 val succ : program
-val somme : program
+val sum : program
 val constant : program
 val bigger : program
 
@@ -34,7 +34,7 @@ val translate : program  -> int array -> int -> program
 val compose2 : program -> program array -> int -> program
 
 (*******************************)
-(*          EXERCICE 6  prog_of_expr       *)
+(*          EXERCICE 6         *)
 (*******************************)
 val prog_of_expr : expression -> program
 

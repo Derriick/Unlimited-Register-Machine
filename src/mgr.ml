@@ -10,10 +10,10 @@ type expression =
 (********************************)
 
 let succ = [|Incr(1)|]
-let somme = [|Reset(3); Jump(2, 3, 5); Incr(1); Incr(3); Jump(0, 0, 1)|]
+let sum = [|Reset(3); Jump(2, 3, 5); Incr(1); Incr(3); Jump(0, 0, 1)|]
 let constant = [|Set(1, 1)|]
-let bigger = [|Set(1, 3); Set(2, 4); Jump(1, 4, 10); Jump(2, 3, 7); Incr(1); Incr(2);
-               Jump(0, 0, 2); Reset(1); Incr(1); Jump(0, 0, 11); Reset(1)|]
+let bigger = [|Set(1, 3); Set(2, 4); Jump(1, 4, 10); Jump(2, 3, 7); Incr(1);
+               Incr(2); Jump(0, 0, 2); Reset(1); Incr(1); Jump(0, 0, 11); Reset(1)|]
 
 
 (********************************)
@@ -37,13 +37,6 @@ let debug_program reg_array prog =
 
 let compose1 prog1 prog2 =
 	let len = Array.length prog1 in
-	let prog1' = Array.map (
-		fun inst ->
-			match inst with
-			| Jump(n1, n2, n3) -> Jump(n1, n2, min n3 len)
-			| _ -> inst
-		) prog1
-	in
 	let prog2' = Array.map (
 		fun inst ->
 			match inst with
@@ -51,7 +44,7 @@ let compose1 prog1 prog2 =
 			| _ -> inst
 		) prog2
 	in
-	Array.append prog1' prog2'
+	Array.append prog1 prog2'
 
 
 (********************************)
@@ -116,7 +109,7 @@ let compose2 progF progG_vect k =
 (********************************)
 
 let prog_of_expr expr =
-	let rho_somme = rho somme in
+	let rhoS = rho sum in
 	let rec aux expr =
 		match expr with
 		| S(expr1, expr2) ->
@@ -124,12 +117,20 @@ let prog_of_expr expr =
 			let prog2 = aux expr2 in
 			let rho1 = rho prog1 in
 			let rho2 = rho prog2 in
+			let regN = max rhoS (max rho1 rho2) + 1 in
+			let prog_save = Array.init regN (
+				fun i -> Set(i + 1, regN + i + 1)
+				)
+			in
+			let reg_vect1 = array_vect rho1 1 in
 			let reg_vect2 = array_vect rho2 (rho1 + 1) in
-			let prog2_t = translate prog2 reg_vect2 (rho1 + 1) in
-			let prog = compose1 prog1 prog2_t in
-			let reg_vect = array_vect rho_somme (rho_somme + rho1 + rho2 + 2) in
-			let prog_t = translate prog reg_vect (rho1 + rho2 + 2) in
-			compose1 prog_t somme
+			let reg_vectS = array_vect rhoS (rho1 + rho2 + 1) in
+			let prog1_t = translate prog1 reg_vect1 (rho1 + rho2 + 1) in
+			let prog2_t = translate prog2 reg_vect2 (rho1 + rho2 + 2) in
+			let sum_t = translate sum reg_vectS 1 in
+			let ret1 = compose1 prog_save prog1_t in
+			let ret2 = compose1 ret1 prog2_t in
+			compose1 ret2 sum_t
 		| I(n) -> constant
 	in
 	aux expr
@@ -140,17 +141,23 @@ let prog_of_expr expr =
 (********************************)
 
 let if_then_else progC progT progF =
-	let lenC = Array.length progC in
-	let lenT = Array.length progT in
 	let rhoC = rho progC in
 	let rhoT = rho progT in
 	let rhoF = rho progF in
-	let reg_vect_T = array_vect rhoT (rhoC + 1) in
-	let reg_vect_F = array_vect rhoF (rhoC + rhoT + 1) in
+	let max_rhoTF = max rhoT rhoF in
+	let regN = max rhoC max_rhoTF + 1 in
+	let prog_save = Array.init max_rhoTF (
+		fun i -> Set(i + 1, regN + i + 1)
+		)
+	in
+	let reg_vect_T = array_vect rhoT (regN + 1) in
+	let reg_vect_F = array_vect rhoF (regN + 1) in
 	let progT_t = translate progT reg_vect_T 1 in
 	let progF_t = translate progF reg_vect_F 1 in
-	let ret1 = compose1 [|Reset(rhoC)|] progC in
-	let ret2 = compose1 ret1 [|Jump(1, rhoC, lenC + lenT - 1)|] in
+	let lenT_t = Array.length progT_t in
+	let lenF_t = Array.length progF_t in
+	let ret1 = compose1 prog_save progC in
+	let ret2 = compose1 ret1 [|Reset(regN); Jump(1, regN, lenT_t + 3)|] in
 	let ret3 = compose1 ret2 progT_t in
-	let ret4 = compose1 ret3 [|Jump(0, 0, max_steps)|] in
+	let ret4 = compose1 ret3 [|Jump(0, 0, lenF_t + 1)|] in
 	compose1 ret4 progF_t

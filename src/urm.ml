@@ -8,7 +8,7 @@ type program = instruction array
 type reg_array = int array
 
 let max_reg = 128
-let max_steps = 200
+let max_steps = 10000
 
 exception Memory_exhausted
 exception Segmentation_fault
