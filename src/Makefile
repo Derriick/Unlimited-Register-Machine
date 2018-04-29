@@ -1,11 +1,11 @@
-APP = test
+APP = app
 
 CAMLC = ocamlc
 .PRECIOUS: %.cmi %.cmo
 
-SRC = $(wildcard *.mli)
-INT = $(SRC:.mli=.cmi)
-OBJ = $(SRC:.mli=.cmo)
+SRC = urm mgr exec
+INT = $(SRC:=.cmi)
+OBJ = $(SRC:=.cmo)
 
 all: $(APP)
 

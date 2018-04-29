@@ -12,11 +12,12 @@ exception Segmentation_fault
 exception Resources_exhausted
 
 val max_reg : int
-val max_step : int
+val max_steps : int
 val empty : program
 
 val print_reg_array : reg_array -> int -> unit
 val print_prog : program -> unit
 val rho : program -> int
 val normalize : program -> program
+val clean_program : program -> program
 val run_program : reg_array -> program -> int

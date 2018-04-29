@@ -16,7 +16,7 @@ val bigger : program
 (*          EXERCICE 2         *)
 (*******************************)
 val string_of_prog : program -> unit
-val debug_program : reg_array -> program -> unit
+val debug_program : reg_array -> program -> int
 
 (*******************************)
 (*          EXERCICE 3         *)
@@ -26,7 +26,7 @@ val compose1 : program -> program -> program
 (*******************************)
 (*          EXERCICE 4         *)
 (*******************************)
-val translate : program  -> reg_array -> int -> program
+val translate : program  -> int array -> int -> program
 
 (*******************************)
 (*          EXERCICE 5         *)

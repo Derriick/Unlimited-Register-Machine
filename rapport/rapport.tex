@@ -58,7 +58,7 @@
 	| Set of int*int
 	| Jump of int*int*int
 \end{lstlisting}
-	Les registres sont stockés dans des tableaux que nous initialisons à une taille fixe \texttt{max\_registers}. Pour chaque programme, le résultat après son exécution est stocké dans le registre 0. Il reste cependant possible de récupérer des résultats dans d'autres registres. Un programme est alors un tableau d’instructions.\\
+	Les registres sont stockés dans des tableaux que nous initialisons à une taille fixe \texttt{max\_registers}. Comme dans le cours, nous utilisons le registre 0 pour désigner l’instruction en cours. Pour chaque programme, le résultat après son exécution est stocké dans le registre 1 par défaut. Il reste cependant possible de récupérer des résultats dans d'autres registres. Un programme est alors un tableau d’instructions.\\
 	Quelques outils ont également été implémentés pour manipuler des URM.
 \end{abstract}
 

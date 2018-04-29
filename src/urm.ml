@@ -8,7 +8,7 @@ type program = instruction array
 type reg_array = int array
 
 let max_reg = 128
-let max_step = 10000
+let max_steps = 200
 
 exception Memory_exhausted
 exception Segmentation_fault
@@ -34,35 +34,34 @@ let is_resources_exhausted steps =
 	else
 	()
 
-let print_reg_array reg_array rho =
-	let _ = Array.iter (
-		fun n ->
-			Printf.printf "|\t%d" n
-		) reg_array
-	in
-	Printf.printf "\n"
+let print_reg_array reg_array max =
+	for i = 0 to max do
+		Printf.printf "| %d\t" reg_array.(i)
+	done;
+	Printf.printf "|\n"
 
 let print_prog prog =
-	Array.iter (
-		fun inst ->
+	Array.iteri (
+		fun i inst ->
 			match inst with
-			| Reset(n1) -> Printf.printf "Reset(%d)\n" n1
-			| Incr(n1) -> Printf.printf "Incr(%d)\n" n1
-			| Set(n1, n2) -> Printf.printf "Set(%d,%d)\n" n1 n2
-			| Jump(n1, n2, n3) -> Printf.printf "Jump(%d,%d,%d)\n" n1 n2 n3
+			| Reset(n1) -> Printf.printf "%8d Reset(%d)\n" i n1
+			| Incr(n1) -> Printf.printf "%8d Incr(%d)\n" i n1
+			| Set(n1, n2) -> Printf.printf "%8d Set(%d,%d)\n" i n1 n2
+			| Jump(n1, n2, n3) -> Printf.printf "%8d Jump(%d,%d,%d)\n" i n1 n2 n3
 		) prog
 
 let run_instruction reg_array inst i =
+	reg_array.(0) <- i;
 	match inst with
-	| Reset(n1) ->
-		let _ = is_memory_exhausted n1 in
-		let _ = is_segmentation_fault n1 in
-		reg_array.(n1) <- 0;
+	| Reset(n) ->
+		let _ = is_memory_exhausted n in
+		let _ = is_segmentation_fault n in
+		reg_array.(n) <- 0;
 		i + 1
-	| Incr(n1) ->
-		let _ = is_memory_exhausted n1 in
-		let _ = is_segmentation_fault n1 in
-		reg_array.(n1) <- reg_array.(n1) + 1;
+	| Incr(n) ->
+		let _ = is_memory_exhausted n in
+		let _ = is_segmentation_fault n in
+		reg_array.(n) <- reg_array.(n) + 1;
 		i + 1
 	| Set(n1, n2) ->
 		let _ = is_memory_exhausted n1 in
@@ -72,7 +71,7 @@ let run_instruction reg_array inst i =
 	| Jump(n1, n2, n3) ->
 		let _ = is_memory_exhausted n1 in
 		let _ = is_memory_exhausted n2 in
-		if n1 = n2 then
+		if reg_array.(n1) = reg_array.(n2) then
 			n3
 		else
 			i + 1
@@ -92,36 +91,35 @@ let normalize prog =
 	Array.map (
 		fun inst ->
 			match inst with
-			| Jump(n1, n2, _) -> Jump(n1, n2, n)
+			| Jump(n1, n2, _) -> Jump(n1, n2, n) (* n = nombre d'instructions + 1 *)
 			| _ -> inst
 		) prog
 
 let clean_program prog =
-	let reg_max = rho prog in
-	let reset_prog = Array.init reg_max (
-		fun n -> Reset(n + 1)
+	let rho_prog = rho prog in
+	let reset_prog = Array.init (rho_prog - 2) (
+		fun n -> Reset(n + 2)
 		)
 	in
 	Array.append prog reset_prog
 
-let step_program reg_array prog max_step =
+let step_program reg_array prog max_steps =
 	let rec aux i steps =
 		let _ = is_resources_exhausted steps in
 		let next_i = run_instruction reg_array (prog.(i)) i in
 		if next_i >= (Array.length prog) then
-			reg_array.(0)
+			reg_array.(1)
 		else
 			aux next_i (steps - 1)
 	in
-	aux 0 max_step
+	aux 0 max_steps
 
 let run_program reg_array prog =
-	let _ = step_program reg_array prog max_step in
-	reg_array.(0)
+	step_program reg_array prog max_steps
 
 let run_function prog n =
 	let reg_array = Array.make max_reg 0 in
-	reg_array.(0) <- n;
+	reg_array.(1) <- n;
 	let _ = run_program reg_array prog in
 	let rho = rho prog in
 	print_reg_array reg_array rho
