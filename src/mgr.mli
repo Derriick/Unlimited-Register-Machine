@@ -11,6 +11,7 @@ val succ : program
 val sum : program
 val constant : program
 val bigger : program
+val mult : program
 
 (*******************************)
 (*          EXERCICE 2         *)

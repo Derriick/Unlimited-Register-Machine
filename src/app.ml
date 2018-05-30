@@ -13,6 +13,7 @@ let _ = exec1 succ a
 let _ = exec2 sum a b
 let _ = exec1 constant a
 let _ = exec2 bigger a b
+let _ = exec2 mult a b
 
 (********************************)
 (*          EXERCICE 2          *)
