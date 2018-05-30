@@ -14,7 +14,7 @@ let sum = [|Reset(3); Jump(2, 3, 5); Incr(1); Incr(3); Jump(0, 0, 1)|]
 let constant = [|Set(1, 1)|]
 let bigger = [|Set(1, 3); Set(2, 4); Jump(1, 4, 10); Jump(2, 3, 7); Incr(1);
                Incr(2); Jump(0, 0, 2); Reset(1); Incr(1); Jump(0, 0, 11); Reset(1)|]
-let mult = [|Set(1,3); Reset(1); Jump(2,4,100); Jump(3,5,7); Incr(1); Incr(5); Jump(0,0,3); Reset(5); Incr(4); Jump(0,0,2)|]
+let mult = [|Jump(2,4,8); Jump(1,5,5); Incr(3); Incr(5); Jump(0,0,1); Reset(5); Incr(4); Jump(0,0,0); Set(3,1)|]
 
 
 (********************************)
